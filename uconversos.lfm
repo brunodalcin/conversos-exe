@@ -20,7 +20,7 @@ object FrmConverterCompressor: TFrmConverterCompressor
     Width = 720
     Color = clMedGray
     ParentColor = False
-    object lbDropImages: TLabel
+    object lbDrop: TLabel
       Left = 248
       Height = 40
       Top = 32
@@ -72,13 +72,14 @@ object FrmConverterCompressor: TFrmConverterCompressor
       Height = 152
       Top = 264
       Width = 640
-      ActivePage = tsCompressor
+      ActivePage = tsConverter
       Font.CharSet = ANSI_CHARSET
       Font.Pitch = fpVariable
       Font.Quality = fqDraft
       ParentFont = False
-      TabIndex = 1
+      TabIndex = 0
       TabOrder = 1
+      OnChange = pgControlChange
       object tsConverter: TTabSheet
         Caption = 'Converter'
         ClientHeight = 124
@@ -114,44 +115,35 @@ object FrmConverterCompressor: TFrmConverterCompressor
             Height = 26
             Top = 48
             Width = 200
+            CharCase = ecUppercase
             Font.CharSet = ANSI_CHARSET
             Font.Height = -15
             Font.Name = 'Unispace'
             Font.Pitch = fpVariable
             Font.Quality = fqDraft
             ItemHeight = 18
-            Items.Strings = (
-              'PNG'
-              'JPG'
-              'BMP'
-              'WEBP'
-            )
             ParentFont = False
             ReadOnly = True
             TabOrder = 0
-            Text = 'Select a format'
+            Text = 'SELECT A FORMAT'
           end
           object cbFrom: TComboBox
             Left = 24
             Height = 26
             Top = 48
             Width = 200
+            CharCase = ecUppercase
             Font.CharSet = ANSI_CHARSET
             Font.Height = -15
             Font.Name = 'Unispace'
             Font.Pitch = fpVariable
             Font.Quality = fqDraft
             ItemHeight = 18
-            Items.Strings = (
-              'PNG'
-              'JPG'
-              'BMP'
-              'WEBP'
-            )
             ParentFont = False
             ReadOnly = True
             TabOrder = 1
-            Text = 'Select a format'
+            Text = 'SELECT A FORMAT'
+            OnChange = cbFromChange
           end
           object lbFrom: TLabel
             Left = 24
@@ -188,6 +180,7 @@ object FrmConverterCompressor: TFrmConverterCompressor
             ParentBackground = False
             ParentFont = False
             TabOrder = 2
+            OnClick = btnConvertClick
             OnMouseEnter = btnConvertMouseEnter
             OnMouseLeave = btnConvertMouseLeave
           end
@@ -206,16 +199,39 @@ object FrmConverterCompressor: TFrmConverterCompressor
           ClientWidth = 634
           ParentBackground = False
           TabOrder = 0
-          object btnConverter1: TBitBtn
-            Left = 248
-            Height = 30
-            Top = 48
-            Width = 136
-            Caption = 'btnConverter'
+          object btnCompress: TPanel
+            Cursor = crHandPoint
+            Left = 240
+            Height = 36
+            Top = 43
+            Width = 148
+            BorderWidth = 1
+            BorderStyle = bsSingle
+            Caption = 'Compress'
+            Font.CharSet = ANSI_CHARSET
+            Font.Height = -16
+            Font.Name = 'Unispace'
+            Font.Pitch = fpVariable
+            Font.Quality = fqDraft
+            Font.Style = [fsBold]
+            ParentBackground = False
+            ParentFont = False
             TabOrder = 0
+            OnMouseEnter = btnConvertMouseEnter
+            OnMouseLeave = btnConvertMouseLeave
           end
         end
       end
+    end
+    object arrow: TArrow
+      Left = 480
+      Height = 32
+      Top = 40
+      Width = 56
+      ArrowType = atDown
+      Constraints.MinHeight = 8
+      Constraints.MinWidth = 8
+      OnClick = arrowClick
     end
   end
 end

@@ -104,9 +104,35 @@ end;
 
 procedure TFrmConverterCompressor.btnConvertClick(Sender: TObject);
 var
-  file_From, file_To: TFPCustomImage;
+  img : TFPCustomImage;
+  reader : TFPCustomImageReader;
+  writer: TFPWriterPNG;
+  i,pos_dot : integer;
+  filepath : string;
 begin
   //Convert()
+  //testing just jpeg to png for now
+  img    := TFPMemoryImage.Create(0,0);
+  reader := TFPReaderJPEG.Create;
+  writer := TFPWriterPNG.Create;
+
+  for i:=0 to listbImages.Count - 1 do begin
+    filepath := listbImages.Items[i];
+    img.LoadFromFile(filepath,reader);
+    //MUST have .filetype
+    pos_dot := LastDelimiter('.',listbImages.Items[i]);
+    if pos_dot > 0 then
+      filepath := Copy(listbImages.Items[i], 1, pos_dot - 1) //getting just path+filename without filetype ex: 'c:/images/img01.jpeg' TO 'c:/images/img01'
+    else
+      exit;
+
+    //saving in the same path as the image loaded
+    img.SaveToFile(filepath+'.png',writer);
+  end;
+
+  showmessage('done');
+  listbImages.Clear;
+
 end;
 
 procedure TFrmConverterCompressor.arrowClick(Sender: TObject);

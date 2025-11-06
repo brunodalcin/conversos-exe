@@ -35,7 +35,6 @@ type
     pgControl: TPageControl;
     tsCompressor: TTabSheet;
     tsConverter: TTabSheet;
-    procedure arrowClick(Sender: TObject);
     procedure btnConvertClick(Sender: TObject);
     procedure btnConvertEnter(Sender: TObject);
     procedure btnConvertMouseEnter(Sender: TObject);
@@ -53,6 +52,8 @@ type
     const txt = '#F2EBD5';
     const border = '#4A453E';
     const highlight = '#EAC65A';
+    function GetImageReader : TFPCustomImageReader;
+    function GetImageWriter : TFPCustomImageWriter ;
     function HexToColor(Hex: string): TColor;
     procedure AttToCombobox;
     //procedure Convert(const InputFile, OutputFile : string);
@@ -104,22 +105,28 @@ end;
 
 procedure TFrmConverterCompressor.btnConvertClick(Sender: TObject);
 var
-  img : TFPCustomImage;
-  reader : TFPCustomImageReader;
-  writer: TFPWriterPNG;
   i,pos_dot : integer;
   filepath : string;
-begin
-  //Convert()
-  //testing just jpeg to png for now
-  img    := TFPMemoryImage.Create(0,0);
-  reader := TFPReaderJPEG.Create;
-  writer := TFPWriterPNG.Create;
+  img : TFPCustomImage;
 
-  for i:=0 to listbImages.Count - 1 do begin
+  // for now, i create as TFPCustom, so i can give any imagetypeclass
+  reader : TFPCustomImageReader;
+  writer: TFPCustomImageWriter;
+begin
+  if listbImages.Count = 0 then begin
+    MessageDlg('Warning', ' No images were uploaded... ', mtWarning, [mbOK], 0);
+    Exit;
+  end;
+
+  img    := TFPMemoryImage.Create(0,0);
+  // get the TFP unit depending on what was selected
+  reader := GetImageReader;
+  writer := GetImageWriter;
+
+  try
+    for i:=0 to listbImages.Count - 1 do begin
     filepath := listbImages.Items[i];
     img.LoadFromFile(filepath,reader);
-    //MUST have .filetype
     pos_dot := LastDelimiter('.',listbImages.Items[i]);
     if pos_dot > 0 then
       filepath := Copy(listbImages.Items[i], 1, pos_dot - 1) //getting just path+filename without filetype ex: 'c:/images/img01.jpeg' TO 'c:/images/img01'
@@ -127,17 +134,12 @@ begin
       exit;
 
     //saving in the same path as the image loaded
-    img.SaveToFile(filepath+'.png',writer);
+    img.SaveToFile(filepath+'.'+LowerCase(cbTo.Text),writer);
   end;
-
-  showmessage('done');
+  finally
+    MessageDlg('Success', 'Images converted.. ', mtConfirmation, [mbOK], 0);
+  end;
   listbImages.Clear;
-
-end;
-
-procedure TFrmConverterCompressor.arrowClick(Sender: TObject);
-begin
-
 end;
 
 procedure TFrmConverterCompressor.btnConvertMouseEnter(Sender: TObject);
@@ -152,7 +154,7 @@ end;
 
 procedure TFrmConverterCompressor.cbFromChange(Sender: TObject);
 begin
-  //when changing FROM combobox, the TO cannot have the same value ex FROM 'jpg' TO 'jpg'
+  //when changing FROM combobox, the TO cannot have the same value ex FROM 'png' TO 'png'
   AttToCombobox;
 end;
 
@@ -166,7 +168,7 @@ begin
     try
       listbImages.Items.Add(filename);
     except
-      showmessage('error');
+        MessageDlg('Error', 'Unable to upload the image.. ', mtError, [mbOK], 0);
     end;
   end;
 end;
@@ -183,8 +185,8 @@ begin
     lbDrop.Caption := 'Drop Images'
   else
     lbDrop.Caption := 'Drop Files';
+  listbImages.Clear;
 end;
-
 
 function TFrmConverterCompressor.HexToColor(Hex: string): TColor;
 var
@@ -222,14 +224,30 @@ begin
   end;
 end;
 
-{procedure TFrmConverterCompressor.Convert(const InputFile, OutputFile : string);
-var
-  Img: TFPMemoryImage;
-  Reader: TFPCustomImageReader;
-  Writer: TFPCustomImageWriter;
+function TFrmConverterCompressor.GetImageReader : TFPCustomImageReader;
 begin
+  case UpperCase(cbFrom.Text) of
+    'PNG':  Result := TFPReaderPNG.Create;
+    'JPEG': Result := TFPReaderJPEG.Create;
+    'BMP':  Result := TFPReaderBMP.Create;
+  else
+    Result := nil;
+  end;
 
-end;}
+end;
+
+function TFrmConverterCompressor.GetImageWriter : TFPCustomImageWriter;
+begin
+  case UpperCase(cbTo.Text) of
+    'PNG':  Result := TFPWriterPNG.Create;
+    'JPEG': Result := TFPWriterJPEG.Create;
+    'BMP':  Result := TFPWriterBMP.Create;
+  else
+    Result := nil;
+  end;
+end;
 
 end.
+
+
 

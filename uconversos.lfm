@@ -231,7 +231,6 @@ object FrmConverterCompressor: TFrmConverterCompressor
       ArrowType = atDown
       Constraints.MinHeight = 8
       Constraints.MinWidth = 8
-      OnClick = arrowClick
     end
   end
 end

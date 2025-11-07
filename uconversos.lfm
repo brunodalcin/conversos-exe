@@ -20,8 +20,21 @@ object FrmConverterCompressor: TFrmConverterCompressor
     Width = 720
     Color = clMedGray
     ParentColor = False
+    object listbImages: TListBox
+      Left = 40
+      Height = 160
+      Top = 96
+      Width = 640
+      Color = clWhite
+      Font.Color = clBackground
+      Font.Height = -13
+      Font.Style = [fsBold]
+      ItemHeight = 0
+      ParentFont = False
+      TabOrder = 0
+    end
     object lbDrop: TLabel
-      Left = 248
+      Left = 40
       Height = 40
       Top = 32
       Width = 220
@@ -36,19 +49,6 @@ object FrmConverterCompressor: TFrmConverterCompressor
       Font.Style = [fsBold]
       ParentColor = False
       ParentFont = False
-    end
-    object listbImages: TListBox
-      Left = 40
-      Height = 160
-      Top = 96
-      Width = 640
-      Color = clWhite
-      Font.Color = clBackground
-      Font.Height = -13
-      Font.Style = [fsBold]
-      ItemHeight = 0
-      ParentFont = False
-      TabOrder = 0
     end
     object lbClose: TLabel
       Left = 590
@@ -217,6 +217,7 @@ object FrmConverterCompressor: TFrmConverterCompressor
             ParentBackground = False
             ParentFont = False
             TabOrder = 0
+            OnClick = btnCompressClick
             OnMouseEnter = btnConvertMouseEnter
             OnMouseLeave = btnConvertMouseLeave
           end
@@ -224,13 +225,35 @@ object FrmConverterCompressor: TFrmConverterCompressor
       end
     end
     object arrow: TArrow
-      Left = 480
+      Left = 272
       Height = 32
       Top = 40
       Width = 56
       ArrowType = atDown
       Constraints.MinHeight = 8
       Constraints.MinWidth = 8
+    end
+    object btnSelectFiles: TPanel
+      Cursor = crHandPoint
+      Left = 416
+      Height = 36
+      Top = 40
+      Width = 264
+      BorderWidth = 1
+      BorderStyle = bsSingle
+      Caption = 'or click here to select files !'
+      Font.CharSet = ANSI_CHARSET
+      Font.Height = -13
+      Font.Name = 'Unispace'
+      Font.Pitch = fpVariable
+      Font.Quality = fqDraft
+      Font.Style = [fsBold]
+      ParentBackground = False
+      ParentFont = False
+      TabOrder = 2
+      OnClick = btnSelectFilesClick
+      OnMouseEnter = btnConvertMouseEnter
+      OnMouseLeave = btnConvertMouseLeave
     end
   end
 end

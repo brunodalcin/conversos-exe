@@ -12,7 +12,9 @@ uses
   FPImage,
   FPReadBMP, FPWriteBMP,
   FPReadJPEG, FPWriteJPEG,
-  FPReadPNG, FPWritePNG;
+  FPReadPNG, FPWritePNG,
+  //compress
+  Zstream;
 
 type
 
@@ -21,6 +23,7 @@ type
   TFrmConverterCompressor = class(TForm)
     arrow: TArrow;
     btnCompress: TPanel;
+    btnSelectFiles: TPanel;
     cbFrom: TComboBox;
     cbTo: TComboBox;
     lbClose: TLabel;
@@ -35,10 +38,12 @@ type
     pgControl: TPageControl;
     tsCompressor: TTabSheet;
     tsConverter: TTabSheet;
+    procedure btnCompressClick(Sender: TObject);
     procedure btnConvertClick(Sender: TObject);
     procedure btnConvertEnter(Sender: TObject);
     procedure btnConvertMouseEnter(Sender: TObject);
     procedure btnConvertMouseLeave(Sender: TObject);
+    procedure btnSelectFilesClick(Sender: TObject);
     procedure cbFromChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDropFiles(Sender: TObject; const FileNames: array of string);
@@ -56,7 +61,6 @@ type
     function GetImageWriter : TFPCustomImageWriter ;
     function HexToColor(Hex: string): TColor;
     procedure AttToCombobox;
-    //procedure Convert(const InputFile, OutputFile : string);
   public
 
   end;
@@ -92,6 +96,10 @@ begin
   btnCompress.Color := HexToColor(dropBg);
   arrow.ArrowColor := HexToColor(txt);
   arrow.Color := HexToColor(PanelBg);
+  btnSelectFiles.Font.Color := HexToColor(txt);
+  btnSelectFiles.Color := HexToColor(dropBg);
+  btnSelectFiles.Font.Color := HexToColor(txt);
+  btnSelectFiles.Color := HexToColor(dropBg);
 
   cbFrom.Items.AddStrings(['PNG', 'JPEG', 'BMP']);
   cbFrom.ItemIndex := 0;
@@ -114,7 +122,7 @@ var
   writer: TFPCustomImageWriter;
 begin
   if listbImages.Count = 0 then begin
-    MessageDlg('Warning', ' No images were uploaded... ', mtWarning, [mbOK], 0);
+    MessageDlg('Warning', ' No images were uploaded to be converter. ', mtWarning, [mbOK], 0);
     Exit;
   end;
 
@@ -137,9 +145,17 @@ begin
     img.SaveToFile(filepath+'.'+LowerCase(cbTo.Text),writer);
   end;
   finally
-    MessageDlg('Success', 'Images converted.. ', mtConfirmation, [mbOK], 0);
+    MessageDlg('Success', 'Images converted.. ', mtCustom, [mbOK], 0);
   end;
   listbImages.Clear;
+end;
+
+procedure TFrmConverterCompressor.btnCompressClick(Sender: TObject);
+begin
+  if listbImages.Count = 0 then begin
+    MessageDlg('Warning', ' No files were uploaded to be compressed. ', mtWarning, [mbOK], 0);
+    Exit;
+  end;
 end;
 
 procedure TFrmConverterCompressor.btnConvertMouseEnter(Sender: TObject);
@@ -150,6 +166,25 @@ end;
 procedure TFrmConverterCompressor.btnConvertMouseLeave(Sender: TObject);
 begin
   (Sender as TPanel).Color := HexToColor(dropBg);
+end;
+
+procedure TFrmConverterCompressor.btnSelectFilesClick(Sender: TObject);
+var
+  dialog : TOpenDialog;
+begin
+  dialog := TOpenDialog.Create(nil);
+  try
+    dialog.Title := 'Select a file';
+    dialog.Filter := 'Image Files|*.png;*.jpeg;*.jpg;*.bmp';
+    dialog.FilterIndex := 1; // default index
+    dialog.Options := [ofFileMustExist, ofHideReadOnly]; // ensure file exists
+    if dialog.Execute then
+      listbImages.Items.Add(dialog.Filename)
+    else
+      ShowMessage('No file selected');
+  finally
+    dialog.Free
+  end;
 end;
 
 procedure TFrmConverterCompressor.cbFromChange(Sender: TObject);

@@ -10,6 +10,7 @@ object FrmConverterCompressor: TFrmConverterCompressor
   ClientHeight = 447
   ClientWidth = 732
   KeyPreview = True
+  LCLVersion = '4.2.0.0'
   OnCreate = FormCreate
   OnDropFiles = FormDropFiles
   OnKeyPress = FormKeyPress
@@ -72,12 +73,12 @@ object FrmConverterCompressor: TFrmConverterCompressor
       Height = 152
       Top = 264
       Width = 640
-      ActivePage = tsConverter
+      ActivePage = tsCompressor
       Font.CharSet = ANSI_CHARSET
       Font.Pitch = fpVariable
       Font.Quality = fqDraft
       ParentFont = False
-      TabIndex = 0
+      TabIndex = 1
       TabOrder = 1
       OnChange = pgControlChange
       object tsConverter: TTabSheet

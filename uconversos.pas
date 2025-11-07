@@ -151,11 +151,52 @@ begin
 end;
 
 procedure TFrmConverterCompressor.btnCompressClick(Sender: TObject);
+var
+  originStream,
+  destinyStream : TFileStream;
+  compressor : TcompressionStream;
+  i : integer;
+  filepath_o,
+  filepath_d : string;
 begin
   if listbImages.Count = 0 then begin
     MessageDlg('Warning', ' No files were uploaded to be compressed. ', mtWarning, [mbOK], 0);
     Exit;
   end;
+  for i:=0 to listbImages.Count - 1 do begin
+    filepath_o := listbImages.Items[i];
+    filepath_d := ChangeFileExt(listbImages.Items[i], '') + '-compressed' + ExtractFileExt(listbImages.Items[i]);
+
+    if not FileExists(filepath_o) then
+      raise Exception.Create('Source file not found: '+filepath_o);
+    try
+      originStream := TFileStream.Create(filepath_o,fmOpenRead);
+      try
+        destinyStream := TFileStream.Create(filepath_d,fmCreate);
+        try
+          compressor := TCompressionStream.create(clMax,destinyStream);
+          try
+            compressor.CopyFrom(originStream,originStream.Size);
+          finally
+            compressor.Free;
+          end;
+        finally
+          destinyStream.Free;
+        end;
+      finally
+        originStream.Free;
+      end;
+
+      Writeln('success ' + filepath_d);
+
+    except
+        on E: Exception do begin
+          WriteLn('Error tying to compress the file: '+E.Message);
+        end;
+    end;
+    listbImages.Clear;
+  end;
+
 end;
 
 procedure TFrmConverterCompressor.btnConvertMouseEnter(Sender: TObject);

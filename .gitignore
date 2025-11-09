@@ -1,5 +1,4 @@
 # Lazarus / Free Pascal
-*.exe
 *.o
 *.ppu
 *.compiled

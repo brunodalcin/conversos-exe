@@ -8,13 +8,11 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, FileCtrl, StdCtrls,
   ExtCtrls, ComCtrls, Buttons, Arrow, ATPanelColor, ATPanelSimple, ATListbox,
   RTTICtrls,
-  //converters
+  //convert and compress
   FPImage,
   FPReadBMP, FPWriteBMP,
   FPReadJPEG, FPWriteJPEG,
   FPReadPNG, FPWritePNG,
-  //compress
-  Zstream;
 
 type
 
@@ -60,6 +58,7 @@ type
     function GetImageReader : TFPCustomImageReader;
     function GetImageWriter : TFPCustomImageWriter ;
     function HexToColor(Hex: string): TColor;
+    function GetImageReaderFromPath(filetype : string) : TFPCustomImageReader;
     procedure AttToCombobox;
   public
 
@@ -152,51 +151,67 @@ end;
 
 procedure TFrmConverterCompressor.btnCompressClick(Sender: TObject);
 var
-  originStream,
-  destinyStream : TFileStream;
-  compressor : TcompressionStream;
-  i : integer;
-  filepath_o,
-  filepath_d : string;
+  img : TFPCustomImage;
+  // for now, i create as TFPCustom, so i can give any imagetypeclass
+  reader : TFPCustomImageReader;
+  writer_png : TFPWriterPNG;
+  writer_jpg : TFPWriterJPEG;
+  filepath_origin,
+  filepath_destiny,
+  filetype: string;
+  i,
+  quality: integer;
 begin
   if listbImages.Count = 0 then begin
     MessageDlg('Warning', ' No files were uploaded to be compressed. ', mtWarning, [mbOK], 0);
     Exit;
   end;
-  for i:=0 to listbImages.Count - 1 do begin
-    filepath_o := listbImages.Items[i];
-    filepath_d := ChangeFileExt(listbImages.Items[i], '') + '-compressed' + ExtractFileExt(listbImages.Items[i]);
 
-    if not FileExists(filepath_o) then
-      raise Exception.Create('Source file not found: '+filepath_o);
-    try
-      originStream := TFileStream.Create(filepath_o,fmOpenRead);
+  img := TFPMemoryImage.Create(0,0);
+  try
+    for i:=0 to listbImages.Count - 1 do begin
+      filepath_origin := listbImages.Items[i];
+      filepath_destiny := ChangeFileExt(listbImages.Items[i], '') + '-compressed' + ExtractFileExt(filepath_origin);
+      filetype := LowerCase(ExtractFileExt(filepath_origin));
+
+      reader := GetImageReaderFromPath(filetype);
       try
-        destinyStream := TFileStream.Create(filepath_d,fmCreate);
-        try
-          compressor := TCompressionStream.create(clMax,destinyStream);
-          try
-            compressor.CopyFrom(originStream,originStream.Size);
-          finally
-            compressor.Free;
-          end;
-        finally
-          destinyStream.Free;
-        end;
+        img.LoadFromFile(filepath_origin,reader);
       finally
-        originStream.Free;
+        //reader already done the job
+        reader.Free;
       end;
 
-      Writeln('success ' + filepath_d);
-
-    except
-        on E: Exception do begin
-          WriteLn('Error tying to compress the file: '+E.Message);
+      // Writer
+      if filetype = '.jpg' then
+      begin
+        writer_jpg := TFPWriterJPEG.Create;
+        try
+          quality := 75;
+          writer_jpg.CompressionQuality := quality;  // 1..100
+          img.SaveToFile(filepath_destiny, writer_jpg);
+        finally
+          writer_jpg.Free;
         end;
+      end
+      else if filetype = '.png' then
+      begin
+        writer_png := TFPWriterPNG.Create;
+        try
+          writer_png.CompressionLevel := clMax;
+          img.SaveToFile(filepath_destiny, writer_png);
+        finally
+          writer_png.Free;
+        end;
+      end
+      else
+        raise Exception.Create('Cannot compress this format.');
     end;
-    listbImages.Clear;
-  end;
 
+  finally
+    MessageDlg('Success', 'Images compressed.. ', mtCustom, [mbOK], 0);
+  end;
+  listbImages.Clear;
 end;
 
 procedure TFrmConverterCompressor.btnConvertMouseEnter(Sender: TObject);
@@ -257,10 +272,6 @@ end;
 
 procedure TFrmConverterCompressor.pgControlChange(Sender: TObject);
 begin
-  if pgControl.ActivePageIndex = 0 then
-    lbDrop.Caption := 'Drop Images'
-  else
-    lbDrop.Caption := 'Drop Files';
   listbImages.Clear;
 end;
 
@@ -321,6 +332,16 @@ begin
   else
     Result := nil;
   end;
+end;
+
+function TFrmConverterCompressor.GetImageReaderFromPath(filetype : string) : TFPCustomImageReader;
+begin
+  if filetype = '.jpg' then
+    Result := TFPReaderJPEG.Create
+  else if filetype = '.png' then
+    Result := TFPReaderPNG.Create
+  else
+    raise Exception.Create('Unsupported format: ' + filetype);
 end;
 
 end.

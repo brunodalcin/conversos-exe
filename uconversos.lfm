@@ -10,7 +10,6 @@ object FrmConverterCompressor: TFrmConverterCompressor
   ClientHeight = 447
   ClientWidth = 732
   KeyPreview = True
-  LCLVersion = '4.2.0.0'
   OnCreate = FormCreate
   OnDropFiles = FormDropFiles
   OnKeyPress = FormKeyPress
@@ -242,7 +241,7 @@ object FrmConverterCompressor: TFrmConverterCompressor
       Width = 264
       BorderWidth = 1
       BorderStyle = bsSingle
-      Caption = 'or click here to select files !'
+      Caption = 'or click here to select images !'
       Font.CharSet = ANSI_CHARSET
       Font.Height = -13
       Font.Name = 'Unispace'

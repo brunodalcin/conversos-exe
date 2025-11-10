@@ -1,13 +1,13 @@
 object FrmConverterCompressor: TFrmConverterCompressor
   Left = 392
-  Height = 447
+  Height = 446
   Top = 250
   Width = 732
   AllowDropFiles = True
   BorderIcons = [biMinimize]
   BorderStyle = bsSingle
   Caption = 'CONVERSOS'
-  ClientHeight = 447
+  ClientHeight = 446
   ClientWidth = 732
   KeyPreview = True
   OnCreate = FormCreate
@@ -220,6 +220,51 @@ object FrmConverterCompressor: TFrmConverterCompressor
             OnClick = btnCompressClick
             OnMouseEnter = btnConvertMouseEnter
             OnMouseLeave = btnConvertMouseLeave
+          end
+          object tbCompressionLevel: TTrackBar
+            Left = 32
+            Height = 36
+            Top = 43
+            Width = 180
+            Max = 3
+            Min = 1
+            PageSize = 1
+            Position = 2
+            OnChange = tbCompressionLevelChange
+            Color = 15790320
+            Font.CharSet = ANSI_CHARSET
+            Font.Color = clMenuText
+            Font.Name = 'Unispace'
+            Font.Pitch = fpVariable
+            Font.Quality = fqDraft
+            ParentColor = False
+            ParentFont = False
+            TabOrder = 1
+          end
+          object lbCompressionLevel: TLabel
+            Left = 27
+            Height = 14
+            Top = 24
+            Width = 98
+            Caption = 'Quality level:'
+            Font.CharSet = ANSI_CHARSET
+            Font.Name = 'Unispace'
+            Font.Pitch = fpVariable
+            Font.Quality = fqDraft
+            ParentFont = False
+          end
+          object lbCompressionValue: TLabel
+            Left = 127
+            Height = 15
+            Top = 24
+            Width = 96
+            Caption = 'Medium (50%)'
+            Font.CharSet = ANSI_CHARSET
+            Font.Height = -13
+            Font.Name = 'Unispace'
+            Font.Pitch = fpVariable
+            Font.Quality = fqDraft
+            ParentFont = False
           end
         end
       end

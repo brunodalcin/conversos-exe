@@ -5,14 +5,14 @@ unit UConversos;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, FileCtrl, StdCtrls,
-  ExtCtrls, ComCtrls, Buttons, Arrow, ATPanelColor, ATPanelSimple, ATListbox,
-  RTTICtrls,
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  ExtCtrls, ComCtrls, Buttons, Arrow, ATPanelSimple, RTTICtrls,
   //convert and compress
   FPImage,
   FPReadBMP, FPWriteBMP,
   FPReadJPEG, FPWriteJPEG,
   FPReadPNG, FPWritePNG,
+  zstream;
 
 type
 
@@ -24,6 +24,8 @@ type
     btnSelectFiles: TPanel;
     cbFrom: TComboBox;
     cbTo: TComboBox;
+    lbCompressionLevel: TLabel;
+    lbCompressionValue: TLabel;
     lbClose: TLabel;
     lbDrop: TLabel;
     lbFrom: TLabel;
@@ -34,6 +36,7 @@ type
     panelConverter: TPanel;
     panelCompressor: TPanel;
     pgControl: TPageControl;
+    tbCompressionLevel: TTrackBar;
     tsCompressor: TTabSheet;
     tsConverter: TTabSheet;
     procedure btnCompressClick(Sender: TObject);
@@ -47,6 +50,7 @@ type
     procedure FormDropFiles(Sender: TObject; const FileNames: array of string);
     procedure FormKeyPress(Sender: TObject; var Key: char);
     procedure pgControlChange(Sender: TObject);
+    procedure tbCompressionLevelChange(Sender: TObject);
 
   private
     const ESC = #27;
@@ -99,6 +103,8 @@ begin
   btnSelectFiles.Color := HexToColor(dropBg);
   btnSelectFiles.Font.Color := HexToColor(txt);
   btnSelectFiles.Color := HexToColor(dropBg);
+  lbCompressionValue.Font.Color := HexToColor(txt);
+  lbCompressionLevel.Font.Color := HexToColor(txt);
 
   cbFrom.Items.AddStrings(['PNG', 'JPEG', 'BMP']);
   cbFrom.ItemIndex := 0;
@@ -167,6 +173,12 @@ begin
     Exit;
   end;
 
+  case tbCompressionLevel.Position of
+    1: quality := 25;
+    2: quality := 50;
+    3: quality := 75;
+  end;
+
   img := TFPMemoryImage.Create(0,0);
   try
     for i:=0 to listbImages.Count - 1 do begin
@@ -182,13 +194,11 @@ begin
         reader.Free;
       end;
 
-      // Writer
       if filetype = '.jpg' then
       begin
         writer_jpg := TFPWriterJPEG.Create;
         try
-          quality := 75;
-          writer_jpg.CompressionQuality := quality;  // 1..100
+          writer_jpg.CompressionQuality := quality;
           img.SaveToFile(filepath_destiny, writer_jpg);
         finally
           writer_jpg.Free;
@@ -198,7 +208,7 @@ begin
       begin
         writer_png := TFPWriterPNG.Create;
         try
-          writer_png.CompressionLevel := clMax;
+          writer_png.CompressionLevel := TCompressionLevel(Round(quality / 100 * 9));
           img.SaveToFile(filepath_destiny, writer_png);
         finally
           writer_png.Free;
@@ -237,7 +247,7 @@ begin
     if dialog.Execute then
       listbImages.Items.Add(dialog.Filename)
     else
-      ShowMessage('No file selected');
+      MessageDlg('Warning', 'No file selected.. ', mtInformation, [mbOK], 0);
   finally
     dialog.Free
   end;
@@ -273,6 +283,15 @@ end;
 procedure TFrmConverterCompressor.pgControlChange(Sender: TObject);
 begin
   listbImages.Clear;
+end;
+
+procedure TFrmConverterCompressor.tbCompressionLevelChange(Sender: TObject);
+begin
+  case tbCompressionLevel.Position of
+    1: lbCompressionValue.Caption := 'Low (25%)';
+    2: lbCompressionValue.Caption := 'Medium (50%)';
+    3: lbCompressionValue.Caption := 'High (75%)';
+  end;
 end;
 
 function TFrmConverterCompressor.HexToColor(Hex: string): TColor;
